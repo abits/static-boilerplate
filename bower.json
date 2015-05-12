@@ -1,0 +1,21 @@
+{
+  "name": "static-boilerplate",
+  "version": "1.0.0",
+  "homepage": "https://github.com/abits/static-boilerplate",
+  "authors": [
+    "Christoph Martel <chris@codeways.org>"
+  ],
+  "description": "Boilerplate for static page development with css, js, html",
+  "license": "BSD",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "web/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "foundation": "~5.5.2"
+  }
+}
