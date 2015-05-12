@@ -1,0 +1,29 @@
+{
+  "name": "static-boilerplate",
+  "version": "1.0.0",
+  "description": "Boilerplate for static pages",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abits/static-boilerplate.git"
+  },
+  "author": "Christoph Martel <chris@codeways.org>",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/abits/static-boilerplate/issues"
+  },
+  "homepage": "https://github.com/abits/static-boilerplate",
+  "devDependencies": {
+    "connect-livereload": "^0.5.3",
+    "express": "^4.12.3",
+    "gulp-autoprefixer": "^2.2.0",
+    "gulp-minify-css": "^1.1.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^2.0.0",
+    "gulp-util": "^3.0.4",
+    "tiny-lr": "^0.1.5"
+  }
+}
