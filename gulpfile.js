@@ -3,6 +3,7 @@ var gulp         = require('gulp'),
     autoprefixer = require('gulp-autoprefixer'),
     minifycss    = require('gulp-minify-css'),
     rename       = require('gulp-rename'),
+    util         = require('gulp-util'),
     morgan       = require('morgan'),
     tinylr;
 
@@ -42,6 +43,7 @@ gulp.task('serve', function() {
   app.use(require('connect-livereload')({port: 3002}));
   app.use(express.static(__dirname + '/public'));
   app.listen(3000);
+  util.log('Server listening on', util.colors.magenta('http://127.0.0.1:3000'));
 });
 
 gulp.task('default', ['serve', 'livereload', 'watch'], function() {});
