@@ -16,20 +16,20 @@ npm install -g gulp
 Load dependencies for project and dev server
 
 ```shell
-$ bower install
-$ npm install
+bower install
+npm install
 ```
 
 Check for available tasks
 
 ```shell
-$ gulp help
+gulp help
 ```
 
 Run
 
 ```shell
-$ gulp
+gulp
 ```
 
 to start the dev server.
