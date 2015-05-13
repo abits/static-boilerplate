@@ -38,6 +38,13 @@ gulp.task('sass', function () {
 gulp.task('assets', function() {
   gulp.src('bower_components/**/*.js')
     .pipe(gulp.dest('src/js/vendor'));
+  gulp.src('bower_components/**/modernizr-*.min.js')
+    .pipe(rename(function (path) {
+      path.dirname  = 'modernizr';
+      path.basename = "modernizr.min";
+      path.extname  = ".js";
+    }))
+    .pipe(gulp.dest('src/js/vendor'));
   gulp.src('bower_components/**/*.{css,map}')
     .pipe(gulp.dest('src/css/vendor'));
 });
@@ -103,4 +110,4 @@ gulp.task('serve', function() {
 gulp.task('dist', ['sass', 'assets', 'assets-dist', 'html'], function() {});
 
 // default, run dev server with live reload / rebuild
-gulp.task('default', ['serve', 'livereload', 'watch', 'assets'], function() {});
+gulp.task('default', ['serve', 'sass', 'livereload', 'watch', 'assets'], function() {});
