@@ -16,7 +16,6 @@ npm install -g gulp
 Load dependencies for project and dev server
 
 ```shell
-bower install
 npm install
 ```
 
