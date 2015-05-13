@@ -28,5 +28,7 @@ node_modules
 
 # 3rd party libs
 lib/vendor
+public/css/vendor
+public/js/vendor
 
 *.sublime-*

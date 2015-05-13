@@ -30,6 +30,13 @@ gulp.task('sass', function () {
     .pipe(gulp.dest('./public/css'));
 });
 
+gulp.task('assets', function() {
+  gulp.src('lib/vendor/**/*.js')
+    .pipe(gulp.dest('public/js/vendor'));
+  gulp.src('lib/vendor/**/*.css')
+    .pipe(gulp.dest('public/css/vendor'));
+});
+
 gulp.task('watch', function() {
   gulp.watch('./src/scss/*.scss', ['sass']);
   gulp.watch('./public/*.html', notifyLiveReload);
@@ -46,4 +53,4 @@ gulp.task('serve', function() {
   util.log('Server listening on', util.colors.magenta('http://127.0.0.1:3000'));
 });
 
-gulp.task('default', ['serve', 'livereload', 'watch'], function() {});
+gulp.task('default', ['serve', 'livereload', 'watch', 'assets'], function() {});
