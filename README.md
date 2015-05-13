@@ -25,7 +25,7 @@ Check for available tasks
 gulp help
 ```
 
-Run
+In the *project root directory* run
 
 ```shell
 gulp
