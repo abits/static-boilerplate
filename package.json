@@ -24,6 +24,7 @@
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^2.0.0",
     "gulp-util": "^3.0.4",
+    "morgan": "^1.5.3",
     "tiny-lr": "^0.1.5"
   }
 }
