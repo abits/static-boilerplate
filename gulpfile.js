@@ -36,7 +36,7 @@ gulp.task('sass', function () {
 
 // install vendor assets in source directory
 gulp.task('assets', function() {
-  gulp.src('bower_components/**/*.js')
+  gulp.src('bower_components/**/*.{js,map}')
     .pipe(gulp.dest('src/js/vendor'));
   gulp.src('bower_components/**/modernizr-*.min.js')
     .pipe(rename(function (path) {
