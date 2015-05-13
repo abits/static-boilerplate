@@ -3,12 +3,12 @@ var gulp         = require('gulp'),
     minifyCss    = require('gulp-minify-css'),
     rename       = require('gulp-rename'),
     util         = require('gulp-util'),
-    morgan       = require('morgan'),
     useref       = require('gulp-useref'),
     gulpif       = require('gulp-if'),
     uglify       = require('gulp-uglify'),
     rename       = require("gulp-rename"),
     taskListing  = require('gulp-task-listing'),
+    nodemon      = require('gulp-nodemon'),
     tinylr;
 
 function notifyLiveReload(event) {
@@ -87,23 +87,28 @@ gulp.task('watch', function() {
 
 // test dist directory
 gulp.task('preview', function() {
-  var express = require('express');
-  var app = express();
-  app.use(morgan('combined'));
-  app.use(express.static(__dirname + '/dist'));
+  var express = require('express'),
+      app     = express(),
+      dirname = __dirname + '/dist';
+  app.use(express.static(dirname));
+  util.log('Serving directory', util.colors.magenta(dirname), 'on', util.colors.magenta('http://127.0.0.1:3033'));
   app.listen(3033);
-  util.log('Serving directory', util.colors.magenta('src/'), 'on', util.colors.magenta('http://127.0.0.1:3033'));
 });
 
 // run dev server
 gulp.task('serve', function() {
-  var express = require('express');
-  var app = express();
-  app.use(morgan('combined'));
-  app.use(require('connect-livereload')({port: 3002}));
-  app.use(express.static(__dirname + '/src'));
-  app.listen(3000);
-  util.log('Serving directory', util.colors.magenta('src/'), 'on', util.colors.magenta('http://127.0.0.1:3000'));
+    var port     = 3000,
+        url      = 'http://127.0.0.1:' + port.toString(),
+        livePort = 3002,
+        docRoot  = 'src',
+        reload   = 'reload';
+    util.log('Serving directory', util.colors.magenta(docRoot), 'on', util.colors.magenta(url));
+    nodemon({
+      script: 'server.js',
+      args: ['--harmony', port.toString(), livePort.toString(), docRoot, reload],
+      ext: 'js',
+      env: { 'NODE_ENV': 'development' }
+    });
 });
 
 // run install pipeline to dist directory (prepare for deployment)

@@ -22,6 +22,7 @@
     "gulp": "^3.8.11",
     "gulp-if": "^1.2.5",
     "gulp-minify-css": "^1.1.1",
+    "gulp-nodemon": "^2.0.3",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^2.0.0",
     "gulp-task-listing": "^1.0.0",
