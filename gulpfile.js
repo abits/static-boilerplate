@@ -9,6 +9,7 @@ var gulp         = require('gulp'),
     rename       = require("gulp-rename"),
     taskListing  = require('gulp-task-listing'),
     nodemon      = require('gulp-nodemon'),
+    rsync        = require('gulp-rsync'),
     tinylr;
 
 function notifyLiveReload(event) {
@@ -49,7 +50,7 @@ gulp.task('assets', function() {
     .pipe(gulp.dest('src/css/vendor'));
 });
 
-// minify and concatenate linked assets, fix paths in html and install 
+// minify and concatenate linked assets, fix paths in html and install
 // to dist directory
 gulp.task('html', function () {
     var assets = useref.assets();
@@ -109,6 +110,16 @@ gulp.task('serve', function() {
       ext: 'js',
       env: { 'NODE_ENV': 'development' }
     });
+});
+
+gulp.task('rsync', function() {
+    return gulp.src('dist/**/*.*')
+        .pipe(rsync({
+            root: 'dist',
+            username: 'deploy',
+            hostname: '1.2.3.4',
+            destination: '/var/www/yourWebsite/'
+        }));
 });
 
 // run install pipeline to dist directory (prepare for deployment)
