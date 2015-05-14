@@ -175,5 +175,8 @@ gulp.task('rsync', function() {
 // run install pipeline to dist directory (prepare for deployment)
 gulp.task('dist', ['sass', 'assets', 'assets-dist', 'html'], function() {});
 
+// compile css, copy vendor deps and lint
+gulp.task('build', ['sass', 'assets', 'lint'], function() {});
+
 // default, run dev server with live reload / rebuild
-gulp.task('default', ['serve', 'sass', 'lint', 'livereload', 'watch', 'assets'], function() {});
+gulp.task('default', ['sass', 'lint', 'livereload', 'watch', 'assets', 'serve'], function() {});
