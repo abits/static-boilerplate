@@ -1,17 +1,22 @@
-"use strict;"
+/*jslint node: true */
+'use strict';
 
-var gulp         = require('gulp'),
-gulpif       = require('gulp-if'),
-minifyCss    = require('gulp-minify-css'),
-nodemon      = require('gulp-nodemon'),
-rename       = require('gulp-rename'),
-rsync        = require('gulp-rsync'),
-sass         = require('gulp-sass'),
-taskListing  = require('gulp-task-listing'),
-uglify       = require('gulp-uglify'),
-useref       = require('gulp-useref'),
-util         = require('gulp-util'),
-tinylr;
+var del          = require('del'),
+    gulp         = require('gulp'),
+    gulpif       = require('gulp-if'),
+    imagemin     = require('gulp-imagemin'),
+    jshint       = require('gulp-jshint'),
+    minifyCss    = require('gulp-minify-css'),
+    nodemon      = require('gulp-nodemon'),
+    rename       = require('gulp-rename'),
+    rsync        = require('gulp-rsync'),
+    sass         = require('gulp-sass'),
+    stylish      = require('jshint-stylish'),
+    taskListing  = require('gulp-task-listing'),
+    uglify       = require('gulp-uglify'),
+    useref       = require('gulp-useref'),
+    util         = require('gulp-util'),
+    tinylr;
 
 function notifyLiveReload(event) {
   var fileName = require('path').relative(__dirname + '/dist', event.path);
@@ -23,6 +28,10 @@ function notifyLiveReload(event) {
 }
 
 gulp.task('help', taskListing);
+
+gulp.task('clean', function() {
+    del(['dist/']);
+});
 
 // start livereload
 gulp.task('livereload', function() {
@@ -66,7 +75,7 @@ gulp.task('html', function () {
 });
 
 // copy minified vendor libs from source to dist
-gulp.task('assets-dist', function() {
+gulp.task('assets-dist', ['optimize'], function() {
   gulp.src('src/css/vendor/**/*.min.css')
   .pipe(gulp.dest('dist/css/vendor'));
   gulp.src('src/js/vendor/**/modernizr-*.min.js')
@@ -78,6 +87,17 @@ gulp.task('assets-dist', function() {
   .pipe(gulp.dest('dist/js/vendor'));
   gulp.src(['src/js/vendor/**/*.min.js', '!src/js/**/test/**'])
   .pipe(gulp.dest('dist/js/vendor'));
+});
+
+
+gulp.task('optimize', function() {
+  return gulp.src('src/img/**/*.{gif,jpg,png,svg}')
+    .pipe(imagemin({
+      progressive: true,
+      svgoPlugins: [{removeViewBox: false}],
+      optimizationLevel: 3
+    }))
+    .pipe(gulp.dest('dist/img/'));
 });
 
 // reload and rebuild from source directory
@@ -120,13 +140,22 @@ gulp.task('serve', function() {
   });
 });
 
+gulp.task('lint', function() {
+  return gulp.src([
+      'gulpfile.js',
+      'server.js',
+      'src/js/*.js'
+    ]).pipe(jshint())
+    .pipe(jshint.reporter(stylish));
+});
+
 gulp.task('rsync', function() {
   return gulp.src('dist/**/*.*')
   .pipe(rsync({
     root: 'dist',
     username: 'deploy',
     hostname: '1.2.3.4',
-    destination: '/var/www/yourWebsite/'
+    destination: '/srv/www/site/'
   }));
 });
 
@@ -134,4 +163,4 @@ gulp.task('rsync', function() {
 gulp.task('dist', ['sass', 'assets', 'assets-dist', 'html'], function() {});
 
 // default, run dev server with live reload / rebuild
-gulp.task('default', ['serve', 'sass', 'livereload', 'watch', 'assets'], function() {});
+gulp.task('default', ['serve', 'sass', 'lint', 'livereload', 'watch', 'assets'], function() {});
