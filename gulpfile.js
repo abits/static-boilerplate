@@ -6,6 +6,7 @@ var del          = require('del'),
     gulpif       = require('gulp-if'),
     imagemin     = require('gulp-imagemin'),
     jshint       = require('gulp-jshint'),
+    karma        = require('karma').server,
     minifyCss    = require('gulp-minify-css'),
     nodemon      = require('gulp-nodemon'),
     rename       = require('gulp-rename'),
@@ -75,7 +76,7 @@ gulp.task('html', function () {
 });
 
 // copy minified vendor libs from source to dist
-gulp.task('assets-dist', ['optimize'], function() {
+gulp.task('assets-dist', ['optimize-images-dist'], function() {
   gulp.src('src/css/vendor/**/*.min.css')
   .pipe(gulp.dest('dist/css/vendor'));
   gulp.src('src/js/vendor/**/modernizr-*.min.js')
@@ -89,8 +90,8 @@ gulp.task('assets-dist', ['optimize'], function() {
   .pipe(gulp.dest('dist/js/vendor'));
 });
 
-
-gulp.task('optimize', function() {
+// optimize images when copying to dist
+gulp.task('optimize-images-dist', function() {
   return gulp.src('src/img/**/*.{gif,jpg,png,svg}')
     .pipe(imagemin({
       progressive: true,
@@ -140,6 +141,7 @@ gulp.task('serve', function() {
   });
 });
 
+// lint javascript
 gulp.task('lint', function() {
   return gulp.src([
       'gulpfile.js',
@@ -149,6 +151,17 @@ gulp.task('lint', function() {
     .pipe(jshint.reporter(stylish));
 });
 
+// run tests once and exit (for ci)
+gulp.task('test', function(done) {
+  karma.start({
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: true
+  }, function() {
+    done();
+  });
+});
+
+// sync with remote dir
 gulp.task('rsync', function() {
   return gulp.src('dist/**/*.*')
   .pipe(rsync({
