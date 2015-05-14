@@ -1,5 +1,7 @@
 # static-boilerplate
 
+[ ![Codeship Status for abits/static-boilerplate](https://codeship.com/projects/a58e7a60-667a-0132-9587-66851841475d/status?branch=master)](https://codeship.com/projects/52850)
+
 This repository provides a simple starting point for frontend-centered development.
 You'll get a minimal project built with Foundation and SASS.  There is also
 a lightweight dev server (running in NodeJS) which supports livereload and SASS rebuilds.
