@@ -1,3 +1,4 @@
+/*jslint node: true */
 var express = require('express'),
     morgan  = require('morgan'),
     app     = express();
