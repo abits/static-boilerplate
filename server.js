@@ -10,8 +10,9 @@ var port        = parseInt(process.argv[3]),
 app.use(morgan('combined'));
 
 if (reload == 'reload') {
-    app.use(require('connect-livereload')({port: livePort}));
+  app.use(require('connect-livereload')({port: livePort}));
 }
+
 app.use(express.static(__dirname + '/' + docRoot));
 
 app.listen(port);

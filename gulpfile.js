@@ -89,10 +89,10 @@ gulp.task('watch', function() {
 });
 
 // preview dist directory
-gulp.task('preview', function() {
+gulp.task('preview', ['dist'], function() {
   var port     = 3033,
       url      = 'http://127.0.0.1:' + port.toString(),
-      livePort = null,
+      livePort = 3002,
       docRoot  = 'dist',
       reload   = '';
   util.log('Serving directory', util.colors.magenta(docRoot), 'on', util.colors.magenta(url));
