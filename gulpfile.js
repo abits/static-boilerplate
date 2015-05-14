@@ -179,4 +179,4 @@ gulp.task('dist', ['sass', 'assets', 'assets-dist', 'html'], function() {});
 gulp.task('build', ['sass', 'assets', 'lint'], function() {});
 
 // default, run dev server with live reload / rebuild
-gulp.task('default', ['sass', 'lint', 'livereload', 'watch', 'assets', 'serve'], function() {});
+gulp.task('default', ['build', 'livereload', 'watch', 'serve'], function() {});
