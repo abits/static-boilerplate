@@ -6,7 +6,7 @@
   "scripts": {
     "postinstall": "bower install",
     "start": "gulp",
-    "test": "karma start karma.config.js --single-run",
+    "test": "./node_modules/karma/bin/karma start karma.conf.js --single-run",
     "build": "gulp dist",
     "deploy": "gulp deploy"
   },
@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/abits/static-boilerplate",
   "devDependencies": {
+    "chai": "^2.3.0",
     "connect-livereload": "^0.5.3",
     "express": "^4.12.3",
     "gulp": "^3.8.11",
@@ -37,7 +38,15 @@
     "gulp-useref": "^1.1.2",
     "gulp-util": "^3.0.4",
     "jshint-stylish": "^1.0.2",
+    "karma": "^0.12.31",
+    "karma-chai": "^0.1.0",
+    "karma-mocha": "^0.1.10",
+    "karma-phantomjs-launcher": "^0.1.4",
+    "karma-sinon": "^1.0.4",
+    "mocha": "^2.2.4",
     "morgan": "^1.5.3",
+    "phantomjs": "^1.9.16",
+    "sinon": "^1.14.1",
     "tiny-lr": "^0.1.5"
   },
   "dependencies": {
