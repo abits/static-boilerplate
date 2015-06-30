@@ -47,21 +47,6 @@ gulp.task('sass', function () {
   .pipe(gulp.dest('./src/css'));
 });
 
-// install vendor assets in source directory
-gulp.task('assets', function() {
-  gulp.src('bower_components/**/*.{js,map}')
-  .pipe(gulp.dest('src/js/vendor'));
-  gulp.src('bower_components/**/modernizr-*.min.js')
-  .pipe(rename(function (path) {
-    path.dirname  = 'modernizr';
-    path.basename = "modernizr.min";
-    path.extname  = ".js";
-  }))
-  .pipe(gulp.dest('src/js/vendor'));
-  gulp.src('bower_components/**/*.{css,map}')
-  .pipe(gulp.dest('src/css/vendor'));
-});
-
 // minify and concatenate linked assets, fix paths in html and install
 // to dist directory
 gulp.task('html', function () {
@@ -77,17 +62,17 @@ gulp.task('html', function () {
 
 // copy minified vendor libs from source to dist
 gulp.task('assets-dist', ['optimize-images-dist'], function() {
-  gulp.src('src/css/vendor/**/*.min.css')
-  .pipe(gulp.dest('dist/css/vendor'));
-  gulp.src('src/js/vendor/**/modernizr-*.min.js')
+  gulp.src('src/bower_components/**/*.min.css')
+  .pipe(gulp.dest('dist/bower_components'));
+  gulp.src('src/bower_components/**/modernizr-*.min.js')
   .pipe(rename(function (path) {
     path.dirname  = 'modernizr';
     path.basename = "modernizr.min";
     path.extname  = ".js";
   }))
-  .pipe(gulp.dest('dist/js/vendor'));
-  gulp.src(['src/js/vendor/**/*.min.js', '!src/js/**/test/**'])
-  .pipe(gulp.dest('dist/js/vendor'));
+  .pipe(gulp.dest('dist/bower_components'));
+  gulp.src(['src/bower_components/**/*.min.js', '!src/js/**/test/**'])
+  .pipe(gulp.dest('dist/bower_components'));
 });
 
 // optimize images when copying to dist
@@ -173,10 +158,10 @@ gulp.task('rsync', function() {
 });
 
 // run install pipeline to dist directory (prepare for deployment)
-gulp.task('dist', ['sass', 'assets', 'assets-dist', 'html'], function() {});
+gulp.task('dist', ['sass', 'assets-dist', 'html'], function() {});
 
 // compile css, copy vendor deps and lint
-gulp.task('build', ['sass', 'assets', 'lint'], function() {});
+gulp.task('build', ['sass', 'lint'], function() {});
 
 // default, run dev server with live reload / rebuild
 gulp.task('default', ['build', 'livereload', 'watch', 'serve'], function() {});
