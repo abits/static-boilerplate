@@ -1,10 +1,11 @@
 /*jslint node: true */
 'use strict';
 
-var 
+var
     browserify   = require('browserify'),
     buffer       = require('vinyl-buffer'),
     del          = require('del'),
+    displayHelp  = require('gulp-display-help'),
     gulp         = require('gulp'),
     gulpif       = require('gulp-if'),
     imagemin     = require('gulp-imagemin'),
@@ -17,10 +18,10 @@ var
     source       = require('vinyl-source-stream'),
     sourcemaps   = require('gulp-sourcemaps'),
     stylish      = require('jshint-stylish'),
-    taskListing  = require('gulp-task-listing'),
     uglify       = require('gulp-uglify'),
     util         = require('gulp-util'),
     tinylr;
+
 
 function notifyLiveReload(event) {
   var fileName = require('path').relative(__dirname + '/dist', event.path);
@@ -30,8 +31,6 @@ function notifyLiveReload(event) {
     }
   });
 }
-
-gulp.task('help', taskListing);
 
 gulp.task('clean', function() {
     del(['dist/']);
@@ -43,22 +42,24 @@ gulp.task('livereload', function() {
   tinylr.listen(3002);
 });
 
-// compile sass in source directory
+// compile sass and publish
 gulp.task('sass', function () {
   gulp.src(['./src/scss/*.scss'])
-  .pipe(sass({ style: 'expanded' }).on('error', sass.logError))
+  .pipe(sourcemaps.init())
+    .pipe(sass({ outputStyle: 'compressed' }).on('error', sass.logError))
+  .pipe(sourcemaps.write('./'))
   .pipe(gulp.dest('./dist/css'));
 });
 
-// copy html to dist
+// publish html
 gulp.task('html', function () {
   return gulp.src(['src/*.html'])
   .pipe(gulp.dest('dist'));
 });
 
-// copy minified vendor libs from source to dist
-gulp.task('assets-dist', ['optimize-images-dist'], function() {
-  var files = ['src/bower_components/**/*.min.js', 
+// publish vendor js & css, fonts and images
+gulp.task('assets', function() {
+  var files = ['src/bower_components/**/*.min.js',
                'src/bower_components/**/*.min.css',
                '!src/js/**/test/**'];
   gulp.src(files)
@@ -66,11 +67,8 @@ gulp.task('assets-dist', ['optimize-images-dist'], function() {
   var fonts = ([]);
   gulp.src(fonts)
   .pipe(gulp.dest('dist/fonts'));
-});
-
-// optimize images when copying to dist
-gulp.task('optimize-images-dist', function() {
-  return gulp.src('src/img/**/*.{gif,jpg,png,svg,ico}')
+  var images = (['src/img/**/*.{gif,jpg,png,svg,ico}']);
+  gulp.src(images)
     .pipe(imagemin({
       progressive: true,
       svgoPlugins: [{removeViewBox: false}],
@@ -79,13 +77,6 @@ gulp.task('optimize-images-dist', function() {
     .pipe(gulp.dest('dist/img/'));
 });
 
-// reload and rebuild from source directory
-gulp.task('watch', function() {
-  gulp.watch('./src/scss/*.scss', ['sass']);
-  gulp.watch('./src/*.html', notifyLiveReload);
-  gulp.watch('./src/js/*.js', notifyLiveReload);
-  gulp.watch('./src/css/*.css', notifyLiveReload);
-});
 
 gulp.task('javascript', function () {
   // set up the browserify instance on a task basis
@@ -93,7 +84,6 @@ gulp.task('javascript', function () {
     entries: './src/js/app.js',
     debug: true
   });
-
   return b.bundle()
     .pipe(source('app.js'))
     .pipe(buffer())
@@ -103,6 +93,14 @@ gulp.task('javascript', function () {
         .on('error', util.log)
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('./dist/js/'));
+});
+
+// reload and rebuild from source directory
+gulp.task('watch', function() {
+  gulp.watch('./src/scss/*.scss', ['sass']);
+  gulp.watch('./src/*.html', notifyLiveReload);
+  gulp.watch('./src/js/*.js', notifyLiveReload);
+  gulp.watch('./src/css/*.css', notifyLiveReload);
 });
 
 // run dev server
@@ -153,7 +151,7 @@ gulp.task('deploy', function() {
 });
 
 // compile css, copy vendor deps and lint
-gulp.task('build', ['sass', 'assets-dist', 'html', 'javascript', 'lint'], function() {});
+gulp.task('build', ['sass', 'assets', 'html', 'javascript', 'lint'], function() {});
 
 // default, run dev server with live reload / rebuild
 gulp.task('default', ['build', 'livereload', 'watch', 'serve'], function() {});
