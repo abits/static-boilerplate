@@ -1,21 +1,24 @@
 /*jslint node: true */
 'use strict';
 
-var del          = require('del'),
+var 
+    browserify   = require('browserify'),
+    buffer       = require('vinyl-buffer'),
+    del          = require('del'),
     gulp         = require('gulp'),
     gulpif       = require('gulp-if'),
     imagemin     = require('gulp-imagemin'),
     jshint       = require('gulp-jshint'),
     karma        = require('karma').server,
-    minifyCss    = require('gulp-minify-css'),
     nodemon      = require('gulp-nodemon'),
     rename       = require('gulp-rename'),
     rsync        = require('gulp-rsync'),
     sass         = require('gulp-sass'),
+    source       = require('vinyl-source-stream'),
+    sourcemaps   = require('gulp-sourcemaps'),
     stylish      = require('jshint-stylish'),
     taskListing  = require('gulp-task-listing'),
     uglify       = require('gulp-uglify'),
-    useref       = require('gulp-useref'),
     util         = require('gulp-util'),
     tinylr;
 
@@ -44,40 +47,30 @@ gulp.task('livereload', function() {
 gulp.task('sass', function () {
   gulp.src(['./src/scss/*.scss'])
   .pipe(sass({ style: 'expanded' }).on('error', sass.logError))
-  .pipe(gulp.dest('./src/css'));
+  .pipe(gulp.dest('./dist/css'));
 });
 
-// minify and concatenate linked assets, fix paths in html and install
-// to dist directory
+// copy html to dist
 gulp.task('html', function () {
-  var assets = useref.assets();
-  return gulp.src('src/*.html')
-  .pipe(assets)
-  .pipe(gulpif('*.js', uglify()))
-  .pipe(gulpif('*.css', minifyCss()))
-  .pipe(assets.restore())
-  .pipe(useref())
+  return gulp.src(['src/*.html'])
   .pipe(gulp.dest('dist'));
 });
 
 // copy minified vendor libs from source to dist
 gulp.task('assets-dist', ['optimize-images-dist'], function() {
-  gulp.src('src/bower_components/**/*.min.css')
+  var files = ['src/bower_components/**/*.min.js', 
+               'src/bower_components/**/*.min.css',
+               '!src/js/**/test/**'];
+  gulp.src(files)
   .pipe(gulp.dest('dist/bower_components'));
-  gulp.src('src/bower_components/**/modernizr-*.min.js')
-  .pipe(rename(function (path) {
-    path.dirname  = 'modernizr';
-    path.basename = "modernizr.min";
-    path.extname  = ".js";
-  }))
-  .pipe(gulp.dest('dist/bower_components'));
-  gulp.src(['src/bower_components/**/*.min.js', '!src/js/**/test/**'])
-  .pipe(gulp.dest('dist/bower_components'));
+  var fonts = ([]);
+  gulp.src(fonts)
+  .pipe(gulp.dest('dist/fonts'));
 });
 
 // optimize images when copying to dist
 gulp.task('optimize-images-dist', function() {
-  return gulp.src('src/img/**/*.{gif,jpg,png,svg}')
+  return gulp.src('src/img/**/*.{gif,jpg,png,svg,ico}')
     .pipe(imagemin({
       progressive: true,
       svgoPlugins: [{removeViewBox: false}],
@@ -94,20 +87,22 @@ gulp.task('watch', function() {
   gulp.watch('./src/css/*.css', notifyLiveReload);
 });
 
-// preview dist directory
-gulp.task('preview', ['dist'], function() {
-  var port     = 3033,
-      url      = 'http://127.0.0.1:' + port.toString(),
-      livePort = 3002,
-      docRoot  = 'dist',
-      reload   = '';
-  util.log('Serving directory', util.colors.magenta(docRoot), 'on', util.colors.magenta(url));
-  nodemon({
-    script: 'server.js',
-    args: ['--harmony', port.toString(), livePort.toString(), docRoot, reload],
-    ext: 'js',
-    env: { 'NODE_ENV': 'development' }
+gulp.task('javascript', function () {
+  // set up the browserify instance on a task basis
+  var b = browserify({
+    entries: './src/js/app.js',
+    debug: true
   });
+
+  return b.bundle()
+    .pipe(source('app.js'))
+    .pipe(buffer())
+    .pipe(sourcemaps.init({loadMaps: true}))
+        // Add transformation tasks to the pipeline here.
+        .pipe(uglify())
+        .on('error', util.log)
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('./dist/js/'));
 });
 
 // run dev server
@@ -115,7 +110,7 @@ gulp.task('serve', function() {
   var port     = 3000,
       url      = 'http://127.0.0.1:' + port.toString(),
       livePort = 3002,
-      docRoot  = 'src',
+      docRoot  = 'dist',
       reload   = 'reload';
   util.log('Serving directory', util.colors.magenta(docRoot), 'on', util.colors.magenta(url));
   nodemon({
@@ -147,7 +142,7 @@ gulp.task('test', function(done) {
 });
 
 // sync with remote dir
-gulp.task('rsync', function() {
+gulp.task('deploy', function() {
   return gulp.src('dist/**/*.*')
   .pipe(rsync({
     root: 'dist',
@@ -157,11 +152,8 @@ gulp.task('rsync', function() {
   }));
 });
 
-// run install pipeline to dist directory (prepare for deployment)
-gulp.task('dist', ['sass', 'assets-dist', 'html'], function() {});
-
 // compile css, copy vendor deps and lint
-gulp.task('build', ['sass', 'lint'], function() {});
+gulp.task('build', ['sass', 'assets-dist', 'html', 'javascript', 'lint'], function() {});
 
 // default, run dev server with live reload / rebuild
 gulp.task('default', ['build', 'livereload', 'watch', 'serve'], function() {});
